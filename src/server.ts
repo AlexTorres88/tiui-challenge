@@ -1,8 +1,11 @@
 /** source/server.ts */
+
 import http from "http";
 import express, { Express } from "express";
 import morgan from "morgan";
 import { songsRouter } from "./songs";
+import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
 
 const router: Express = express();
 
@@ -25,6 +28,21 @@ router.use((req, res, next) => {
 });
 
 router.use("/", songsRouter);
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      version: "2.0",
+      title: "Songs API",
+      description: "API to manage songs through CRUD endpoints",
+      servers: ["http://localhost:3000"],
+    },
+  },
+  apis: ["**/*.ts"],
+};
+
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
+router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 router.use((req, res, next) => {
   const error = new Error("not found");
